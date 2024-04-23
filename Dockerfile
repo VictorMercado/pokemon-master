@@ -25,6 +25,8 @@ COPY ./frontend ./frontend
 
 RUN cd frontend && ~/.bun/bin/bun install && ~/.bun/bin/bun run build 
 
+RUN mkdir static
+
 RUN cp -r frontend/dist/* static/
 
 
