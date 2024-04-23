@@ -23,15 +23,15 @@ COPY ./backend .
 
 COPY ./frontend ./frontend
 
-RUN cd frontend && ~/.bun/bin/bun install && ~/.bun/bin/bun run build 
+# RUN cd frontend && ~/.bun/bin/bun install && ~/.bun/bin/bun run build 
 
-RUN mkdir static
+# RUN mkdir static
 
-RUN cp -r frontend/dist/* static/
+# RUN cp -r frontend/dist/* static/
 
 
 # Expose port 5000 for Flask app
 EXPOSE 5000
 
 # Command to run the Flask application
-CMD ["bash", "-c", "flask --app app run --host 0.0.0.0"]
+CMD ["bash", "-c", "python3 app.py"]

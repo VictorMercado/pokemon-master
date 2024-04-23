@@ -2,7 +2,7 @@ from flask import Flask, render_template, send_from_directory
 from dotenv import load_dotenv
 import os
 
-app = Flask(__name__, static_url_path='', static_folder="./static/dist", template_folder="./templates")
+app = Flask(__name__, static_url_path='', static_folder="static/dist", template_folder="./templates")
 
 def print_files_in_directory(directory):
     """
@@ -19,10 +19,11 @@ def print_files_in_directory(directory):
             print(file_path)
 
 
-@app.route("/", defaults={'path': ''})
-@app.route("/<path>")
-def serve(path):
-    if path != "" and os.path.exists(app.static_folder + '/' + path):
+# @app.route('/', defaults={'path': ''})
+@app.route("/")
+def serve():
+    return send_from_directory(app.static_folder, 'index.html')
+    if path != "/" and os.path.exists(app.static_folder + '/' + path):
         # If the path is not empty or the favicon, return the static file
         return send_from_directory(app.static_folder, path)
     else:
@@ -38,5 +39,5 @@ def hello_world():
 load_dotenv()
 
 if __name__ == '__main__':
-    port = int(os.getenv('PORT', 5000))
+    port = int(os.getenv('PORT', 5003))
     app.run(host='0.0.0.0', port=port)
