@@ -18,17 +18,16 @@ def print_files_in_directory(directory):
             file_path = os.path.join(root, file)
             print(file_path)
 
-# @app.route("/", defaults={'path': ''})
+
+@app.route("/", defaults={'path': ''})
 @app.route("/<path>")
 def serve(path):
-    print(path)
-    return send_from_directory(app.static_folder, 'index.html')
-    # if path != "" and os.path.exists(app.static_folder + '/' + path):
-    #     # If the path is not empty or the favicon, return the static file
-    #     return send_from_directory(app.static_folder, path)
-    # else:
-    #     # Otherwise, serve the index.html file
-    #     return send_from_directory(app.static_folder, 'index.html')
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        # If the path is not empty or the favicon, return the static file
+        return send_from_directory(app.static_folder, path)
+    else:
+        # Otherwise, serve the index.html file
+        return send_from_directory(app.static_folder, 'index.html')
 
 
 
