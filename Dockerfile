@@ -10,13 +10,26 @@ WORKDIR /app
 
 # Install dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y unzip && \
+    pip install --no-cache-dir -r requirements.txt
+
+RUN apt-get update && apt-get install -y curl && \
+    curl -fsSL https://bun.sh/install | bash && \
+    export PATH="$HOME/.bun/bin:$PATH" && \
+    echo $PATH
 
 # Copy the application code into the container
 COPY ./backend .
+
+COPY ./frontend ./frontend
+
+RUN cd frontend && ~/.bun/bin/bun install && ~/.bun/bin/bun run build 
+
+RUN cp -r frontend/dist/* static/
+
 
 # Expose port 5000 for Flask app
 EXPOSE 5000
 
 # Command to run the Flask application
-CMD ["flask", "--app", "app", "run", "--host", "0.0.0.0"]
+CMD ["bash", "-c", "flask --app app run --host 0.0.0.0"]

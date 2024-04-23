@@ -1,24 +1,35 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from dotenv import load_dotenv
 import os
 
-app = Flask(__name__, static_folder="./static", template_folder="./templates")
+app = Flask(__name__, static_url_path='', static_folder="./static/dist", template_folder="./templates")
 
-@app.route("/")
-def index():
-    return render_template("pokemon.html")
+def print_files_in_directory(directory):
+    """
+    Print all files in the specified directory and its subdirectories.
+    
+    Args:
+    directory (str): The path to the directory.
+    """
+    # Walk through the directory tree
+    for root, dirs, files in os.walk(directory):
+        # Print files in the current directory
+        for file in files:
+            file_path = os.path.join(root, file)
+            print(file_path)
 
-@app.route("/pokemon.css")
-def css():
-    with open('./static/pokemon.css', 'r') as file:
-        css_content = file.read()
-    return css_content
+# @app.route("/", defaults={'path': ''})
+@app.route("/<path>")
+def serve(path):
+    print(path)
+    return send_from_directory(app.static_folder, 'index.html')
+    # if path != "" and os.path.exists(app.static_folder + '/' + path):
+    #     # If the path is not empty or the favicon, return the static file
+    #     return send_from_directory(app.static_folder, path)
+    # else:
+    #     # Otherwise, serve the index.html file
+    #     return send_from_directory(app.static_folder, 'index.html')
 
-@app.route("/pokemon.js")
-def js():
-    with open('./static/pokemon.js', 'r') as file:
-        js_content = file.read()
-    return js_content
 
 
 @app.route("/hello")
