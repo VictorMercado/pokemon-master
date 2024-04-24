@@ -7,16 +7,16 @@ type OpponentProps = {
   _attack: number;
   _defense: number;
   _speed: number;
+  _image: string;
 };
 
-const Opponent = ({ _name, _maxHP, _hp, _attack, _defense, _speed, } : OpponentProps) => {
+const Opponent = ({ _name, _maxHP, _hp, _attack, _defense, _speed,_image} : OpponentProps) => {
 
 	return (
 		<div className='z-10 flex h-2/3 w-full p-4'>
 			<div className='flex w-full justify-between'>
-				
-        {/* stats */}
-				<div className='flex max-h-32 w-90 flex-col rounded-xl border bg-black p-1'>
+				{/* stats */}
+				<div className='w-90 flex max-h-32 flex-col rounded-xl border bg-black p-1'>
 					<div className=''>
 						<span className='font-bold'> {_name} </span>
 					</div>
@@ -32,16 +32,11 @@ const Opponent = ({ _name, _maxHP, _hp, _attack, _defense, _speed, } : OpponentP
 				</div>
 				{/* stats */}
 
-        {/* sprite */}
-				<div className='flex h-72 w-72 items-center justify-center pr-6'>
-					<img
-						className='h-44 w-44'
-						src='http://img.pokemondb.net/sprites/black-white/anim/normal/lugia.gif'
-						alt='A sprite of charizard'
-					/>
+				{/* sprite */}
+				<div className='flex h-72 w-72 items-end justify-center pr-6'>
+					{_image && <img className='h-32 w-32' src={_image} />}
 				</div>
-        {/* sprite */}
-
+				{/* sprite */}
 			</div>
 		</div>
 	)

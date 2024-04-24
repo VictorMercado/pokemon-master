@@ -13,3 +13,26 @@ export interface IFruit {
 		value: string
 	}[]
 }
+
+
+export type TPlayerActivePokemon = {
+	name: string
+	hp: number
+	maxHp: number
+	image: string
+	attack: number
+	defense: number
+	speed: number
+	moves: { name: string; dmg: number }[]
+}
+
+export type TOpponentActivePokemon = {
+	name: string
+	hp: number
+	maxHp: number
+	image: string
+	attack: number
+	defense: number
+	speed: number
+	moves: { name: string; dmg: number }[]
+}

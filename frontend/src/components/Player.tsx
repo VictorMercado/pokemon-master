@@ -7,19 +7,19 @@ type PlayerProps = {
 	_attack: number
 	_defense: number
 	_speed: number
+  _image: string
 }
 
-const Player = ({ _name, _maxHP, _hp, _attack, _defense, _speed }: PlayerProps) => {
+const Player = ({ _name, _maxHP, _hp, _attack, _defense, _speed, _image }: PlayerProps) => {
 
 	return (
 		<div className='z-10 flex h-1/3 w-full px-4'>
 			<div className='flex w-full justify-between'>
 				<div className='h-42 w-42 flex items-start justify-center'>
-					<img
+          {_image && <img
 						className='h-44 w-44'
-						src='http://bit.ly/blastoisegif'
-						alt='A sprite of charizard'
-					/>
+						src={_image}
+					/>}
 				</div>
 				<div className='w-90 flex max-h-32 flex-col rounded-xl border bg-black p-1'>
 					<div className=''>
