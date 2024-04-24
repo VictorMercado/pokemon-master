@@ -254,7 +254,7 @@ export default function App(): ReactElement {
 				</div>
 			</div>
 			<div className='flex'>
-				<div className='m-auto flex w-[500px] flex-col'>
+				<div className='flex w-[500px] flex-col'>
 					<h1 className='text-center text-2xl font-bold'>Opponent</h1>
 					<div className='flex p-2'>
 						{isLoading ? (
@@ -262,12 +262,15 @@ export default function App(): ReactElement {
 						) : error ? (
 							<div>Error: {error.message}</div>
 						) : (
-							<div className='flex w-full flex-col gap-4'>
+							<div className='flex w-full flex-col space-y-8'>
 								{opponentPokemonTeam?.map((pokemon: any, _index: number) => (
-									<div className='flex flex-col space-y-2' key={_index}>
-										<div className='flex items-center justify-center'>
+									<div
+										className='flex flex-col space-y-2 border text-sm'
+										key={_index}
+									>
+										<div className='flex items-center justify-center '>
 											<img className='h-24 w-24' src={pokemon?.image} />
-											<div className='border p-4' key={pokemon.name}>
+											<div className='p-4' key={pokemon.name}>
 												<p>name: {pokemon.name}</p>
 												<p>hp: {pokemon.hp}</p>
 												<p>speed: {pokemon.speed}</p>
@@ -303,10 +306,10 @@ export default function App(): ReactElement {
 							height='700'
 							className='absolute z-[-10] bg-neutral-600'
 						></canvas>
-						<h1 className='z-10 text-white text-center'>game tree here</h1>
+						<h1 className='z-10 text-center text-white'>game tree here</h1>
 					</div>
 				</div>
-				<div className='m-auto flex w-[500px] flex-col'>
+				<div className='flex w-[500px] flex-col'>
 					<h1 className='text-center text-2xl font-bold'>Player</h1>
 					<div className='flex p-2'>
 						{isLoading ? (
@@ -316,13 +319,17 @@ export default function App(): ReactElement {
 						) : (
 							<div className='flex w-full flex-col space-y-8'>
 								{pokemonTeam?.map((pokemon: any) => (
-									<div key={pokemon.name} className='flex flex-col space-y-2'>
+									<div
+										key={pokemon.name}
+										className='flex flex-col space-y-2 border text-sm '
+									>
 										<div className='flex items-center justify-center'>
 											<img
 												className='h-24 w-24'
+												// adding image url here cause this is the normal view
 												src={`https://img.pokemondb.net/sprites/black-white/anim/normal/${pokemon.name}.gif`}
 											/>
-											<div className='border p-4' key={pokemon.name}>
+											<div className='p-4' key={pokemon.name}>
 												<p>name: {pokemon.name}</p>
 												<p>hp: {pokemon.hp}</p>
 												<p>speed: {pokemon.speed}</p>
