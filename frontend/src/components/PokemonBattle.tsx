@@ -70,13 +70,16 @@ const PokemonBattle = ({
   useEffect(() => {
     ;(async () => {
       if (gameState.turn_order === 'ai') {
-        let response = await fetch('http://127.0.0.1:5000/ai', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify(gameState)
-				})
+        let response = await fetch(
+					'https://pokemon-master-production.up.railway.app/ai',
+					{
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(gameState)
+					}
+				)
         let data = await response.json()
 				console.log(data);
 				if (Object.keys(data)[0] === 'move') {
