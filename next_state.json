@@ -1,0 +1,141 @@
+{
+    "player": {
+        "active_pokemon_index": 0,
+        "fainted_pokemons": [],
+        "pokemon_team": [
+            {
+                "altImage": "https://img.pokemondb.net/sprites/black-white/anim/normal/charmander.gif",
+                "image": "https://img.pokemondb.net/sprites/black-white/anim/back-normal/charmander.gif",
+                "species": "charmander",
+                "current_hp": 178,
+                "base_stats": {
+                    "hp": 178,
+                    "speed": 65,
+                    "moves": [
+                        {
+                            "name": "scratch",
+                            "type": "normal",
+                            "power": 40
+                        },
+                        {
+                            "name": "confide",
+                            "type": "normal",
+                            "power": null
+                        },
+                        {
+                            "name": "sleep-talk",
+                            "type": "normal",
+                            "power": null
+                        },
+                        {
+                            "name": "fire-fang",
+                            "type": "fire",
+                            "power": 65
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "ai": {
+        "active_pokemon_index": 0,
+        "fainted_pokemons": [],
+        "pokemon_team": [
+            {
+                "image": "https://img.pokemondb.net/sprites/black-white/anim/normal/remoraid.gif",
+                "species": "remoraid",
+                "current_hp": 105,
+                "base_stats": {
+                    "hp": 170,
+                    "speed": 65,
+                    "moves": [
+                        {
+                            "name": "soak",
+                            "type": "water",
+                            "power": null
+                        },
+                        {
+                            "name": "aurora-beam",
+                            "type": "ice",
+                            "power": 65
+                        },
+                        {
+                            "name": "fire-blast",
+                            "type": "fire",
+                            "power": 110
+                        },
+                        {
+                            "name": "sunny-day",
+                            "type": "fire",
+                            "power": null
+                        }
+                    ]
+                }
+            },
+            {
+                "image": "https://img.pokemondb.net/sprites/black-white/anim/normal/combusken.gif",
+                "species": "combusken",
+                "current_hp": 220,
+                "base_stats": {
+                    "hp": 220,
+                    "speed": 55,
+                    "moves": [
+                        {
+                            "name": "scratch",
+                            "type": "normal",
+                            "power": 40
+                        },
+                        {
+                            "name": "double-edge",
+                            "type": "normal",
+                            "power": 120
+                        },
+                        {
+                            "name": "double-team",
+                            "type": "normal",
+                            "power": null
+                        },
+                        {
+                            "name": "double-team",
+                            "type": "normal",
+                            "power": null
+                        }
+                    ]
+                }
+            },
+            {
+                "image": "https://img.pokemondb.net/sprites/black-white/anim/normal/bellsprout.gif",
+                "species": "bellsprout",
+                "current_hp": 200,
+                "base_stats": {
+                    "hp": 200,
+                    "speed": 40,
+                    "moves": [
+                        {
+                            "name": "infestation",
+                            "type": "bug",
+                            "power": 20
+                        },
+                        {
+                            "name": "grass-knot",
+                            "type": "grass",
+                            "power": null
+                        },
+                        {
+                            "name": "leech-life",
+                            "type": "bug",
+                            "power": 80
+                        },
+                        {
+                            "name": "bide",
+                            "type": "normal",
+                            "power": null
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "turn_order": "ai",
+    "winner": ""
+}

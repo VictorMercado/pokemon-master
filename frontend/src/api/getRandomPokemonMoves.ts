@@ -17,7 +17,8 @@ export async function getRandomPokemonMoves(pokemon: string) {
     const data = await response.json();
     return {
       name: move.move.name,
-      dmg: data.power
+      type: data.type.name,
+      power: data.power ? data.power : 0
     }
   });
   return await Promise.all(moves);

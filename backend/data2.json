@@ -1,0 +1,141 @@
+{
+  "player": {
+    "active_pokemon_index": 0,
+    "fainted_pokemons": [],
+    "pokemon_team": [
+      {
+        "altImage": "https://img.pokemondb.net/sprites/black-white/anim/normal/charmander.gif",
+        "image": "https://img.pokemondb.net/sprites/black-white/anim/back-normal/charmander.gif",
+        "species": "charmander",
+        "current_hp": 178,
+        "base_stats": {
+          "hp": 178,
+          "speed": 65,
+          "moves": [
+            {
+              "name": "overheat",
+              "type": "fire",
+              "power": 130
+            },
+            {
+              "name": "dragon-pulse",
+              "type": "dragon",
+              "power": 85
+            },
+            {
+              "name": "belly-drum",
+              "type": "normal",
+              "power": null
+            },
+            {
+              "name": "focus-punch",
+              "type": "fighting",
+              "power": 150
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ai": {
+    "active_pokemon_index": 0,
+    "fainted_pokemons": [],
+    "pokemon_team": [
+      {
+        "image": "https://img.pokemondb.net/sprites/black-white/anim/normal/beartic.gif",
+        "species": "beartic",
+        "current_hp": 140,
+        "base_stats": {
+          "hp": 290,
+          "speed": 50,
+          "moves": [
+            {
+              "name": "flail",
+              "type": "normal",
+              "power": null
+            },
+            {
+              "name": "echoed-voice",
+              "type": "normal",
+              "power": 40
+            },
+            {
+              "name": "thief",
+              "type": "dark",
+              "power": 60
+            },
+            {
+              "name": "rock-slide",
+              "type": "rock",
+              "power": 75
+            }
+          ]
+        }
+      },
+      {
+        "image": "https://img.pokemondb.net/sprites/black-white/anim/normal/natu.gif",
+        "species": "natu",
+        "current_hp": 180,
+        "base_stats": {
+          "hp": 180,
+          "speed": 70,
+          "moves": [
+            {
+              "name": "synchronoise",
+              "type": "psychic",
+              "power": 120
+            },
+            {
+              "name": "signal-beam",
+              "type": "bug",
+              "power": 75
+            },
+            {
+              "name": "baton-pass",
+              "type": "normal",
+              "power": null
+            },
+            {
+              "name": "power-swap",
+              "type": "psychic",
+              "power": null
+            }
+          ]
+        }
+      },
+      {
+        "image": "https://img.pokemondb.net/sprites/black-white/anim/normal/farfetchd.gif",
+        "species": "farfetchd",
+        "current_hp": 204,
+        "base_stats": {
+          "hp": 204,
+          "speed": 60,
+          "moves": [
+            {
+              "name": "frustration",
+              "type": "normal",
+              "power": null
+            },
+            {
+              "name": "double-edge",
+              "type": "normal",
+              "power": 120
+            },
+            {
+              "name": "cut",
+              "type": "normal",
+              "power": 50
+            },
+            {
+              "name": "hidden-power",
+              "type": "normal",
+              "power": 60
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "turn_order": "ai",
+  "winner": ""
+}

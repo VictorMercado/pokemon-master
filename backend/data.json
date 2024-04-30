@@ -1,0 +1,200 @@
+{
+  "player": {
+    "active_pokemon_index": 2,
+    "fainted_pokemons": [
+      0
+    ],
+    "pokemon_team": [
+      {
+        "species": "squirtle",
+        "current_hp": 0,
+        "base_stats": {
+          "hp": 120,
+          "speed": 3,
+          "moves": [
+            {
+              "name": "water cannon",
+              "type": "water",
+              "power": 50
+            },
+            {
+              "name": "water pistol",
+              "type": "water",
+              "power": 25
+            },
+            {
+              "name": "shit in place",
+              "type": "shit",
+              "power": 10
+            },
+            {
+              "name": "heal",
+              "type": "heal",
+              "power": 0
+            }
+          ]
+        }
+      },
+      {
+        "species": "charmander",
+        "current_hp": 240,
+        "base_stats": {
+          "hp": 240,
+          "speed": 12,
+          "moves": [
+            {
+              "name": "fire cannon",
+              "type": "water",
+              "power": 40
+            },
+            {
+              "name": "fire pistol",
+              "type": "water",
+              "power": 25
+            },
+            {
+              "name": "shit in place",
+              "type": "shit",
+              "power": 10
+            },
+            {
+              "name": "heal",
+              "type": "heal",
+              "power": 0
+            }
+          ]
+        }
+      },
+      {
+        "species": "pikachu",
+        "current_hp": 900,
+        "base_stats": {
+          "hp": 90,
+          "speed": 90,
+          "moves": [
+            {
+              "name": "electric cannon",
+              "type": "water",
+              "power": 10
+            },
+            {
+              "name": "electric pistol",
+              "type": "water",
+              "power": 5
+            },
+            {
+              "name": "shit in place",
+              "type": "shit",
+              "power": 15
+            },
+            {
+              "name": "heal",
+              "type": "heal",
+              "power": 9005
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ai": {
+    "active_pokemon_index": 2,
+    "fainted_pokemons": [
+      1
+    ],
+    "pokemon_team": [
+      {
+        "species": "squirtle",
+        "current_hp": 240,
+        "base_stats": {
+          "hp": 240,
+          "speed": 3,
+          "moves": [
+            {
+              "name": "water cannon",
+              "type": "water",
+              "power": 10
+            },
+            {
+              "name": "water pistol",
+              "type": "water",
+              "power": 25
+            },
+            {
+              "name": "shit in place",
+              "type": "shit",
+              "power": 60
+            },
+            {
+              "name": "heal",
+              "type": "heal",
+              "power": 20
+            }
+          ]
+        }
+      },
+      {
+        "species": "charmander",
+        "current_hp": 0,
+        "base_stats": {
+          "hp": 240,
+          "speed": 3,
+          "moves": [
+            {
+              "name": "fire cannon",
+              "type": "water",
+              "power": 50
+            },
+            {
+              "name": "fire pistol",
+              "type": "water",
+              "power": 25
+            },
+            {
+              "name": "shit in place",
+              "type": "shit",
+              "power": 10
+            },
+            {
+              "name": "heal",
+              "type": "heal",
+              "power": 0
+            }
+          ]
+        }
+      },
+      {
+        "species": "pikachu",
+        "current_hp": 10000,
+        "base_stats": {
+          "hp": 120,
+          "speed": 3,
+          "moves": [
+            {
+              "name": "electric cannon",
+              "type": "water",
+              "power": 50
+            },
+            {
+              "name": "electric pistol",
+              "type": "water",
+              "power": 25
+            },
+            {
+              "name": "shit in place",
+              "type": "shit",
+              "power": 10
+            },
+            {
+              "name": "heal",
+              "type": "heal",
+              "power": 9000
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "turn_order": "ai",
+  "winner": ""
+}

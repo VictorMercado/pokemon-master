@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 
 type OpponentProps = {
   _name: string;
-  _maxHP: number;
   _hp: number;
-  _attack: number;
-  _defense: number;
+  _current_hp: number;
+  _attack?: number;
+  _defense?: number;
   _speed: number;
   _image: string;
 };
 
-const Opponent = ({ _name, _maxHP, _hp, _attack, _defense, _speed,_image} : OpponentProps) => {
+const Opponent = ({ _name, _hp, _current_hp, _attack, _defense, _speed,_image} : OpponentProps) => {
 
 	return (
 		<div className='z-10 flex h-2/3 w-full p-4'>
@@ -20,12 +20,12 @@ const Opponent = ({ _name, _maxHP, _hp, _attack, _defense, _speed,_image} : Oppo
 					<div className=''>
 						<span className='font-bold'> {_name} </span>
 					</div>
-					<div className='p-2'>
-						<span className=''> HP: {_hp} </span>
+					<div className='flex items-center p-2'>
+						<span className='mr-2 text-sm'> HP: {_current_hp}</span>
 						<progress
 							className='rounded-md'
-							max={_maxHP}
-							value={_hp}
+							max={_hp}
+							value={_current_hp}
 						></progress>
 					</div>
 					<span className='p-2'> Speed: {_speed} </span>
