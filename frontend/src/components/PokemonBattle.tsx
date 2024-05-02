@@ -39,6 +39,7 @@ const PokemonBattle = ({
 	const [usedPlayerPokemonMove, setUsedPlayerPokemonMove] = useState('')
   const [usedAiPokemonMove, setUsedAiPokemonMove] = useState('')
 	const isPlayerTurn = gameState.turn_order === 'player'
+	const [isOpenAI, setIsOpenAI] = useState(false)
 	// const attackMove = (playerMove: { name: string; dmg: number }) => {
 	// 	let dmg = playerMove.dmg
 	// 	if (playerMove.dmg > opponent.hp) {
@@ -51,27 +52,36 @@ const PokemonBattle = ({
 	// 		}
 	// 	})
 	// }
+
 	useEffect(() => {
-		if (gameState.ai.fainted_pokemons.length !== 3) {
-			if (opponent && opponent.current_hp <= 0) {
-				handleOpponentPokemonRemove()
-			}
-		} else {
-			gameState.winner = 'player'
+		if (player && 
+			gameState.player.pokemon_team.length > 0 &&
+			gameState.player.pokemon_team[gameState.player.active_pokemon_index]
+				.current_hp <= 0
+		) {
+			handlePlayerPokemonRemove()
 		}
-		if (gameState.player.fainted_pokemons.length !== 3) {
-			if (player && player.current_hp <= 0) {
-				handlePlayerPokemonRemove()
-			}
-		} else {
-			gameState.winner = 'ai'
+		if (opponent &&
+			gameState.ai.pokemon_team.length > 0 &&
+			gameState.ai.pokemon_team[gameState.ai.active_pokemon_index].current_hp <=
+				0
+		) {
+			handleOpponentPokemonRemove()
 		}
-	})
+	}, [gameState])
+
   useEffect(() => {
     ;(async () => {
+			if (gameState.winner) {
+				return;
+			}
       if (gameState.turn_order === 'ai') {
         let response = await fetch(
-					'https://pokemon-master-production.up.railway.app/ai',
+					isOpenAI
+						// ? 'http://127.0.0.1:5000/openai'
+						// : 'http://127.0.0.1:5000/ai',
+					? 'https://pokemon-master-production.up.railway.app/openai'
+					: 'https://pokemon-master-production.up.railway.app/ai',
 					{
 						method: 'POST',
 						headers: {
@@ -82,6 +92,9 @@ const PokemonBattle = ({
 				)
         let data = await response.json()
 				console.log(data);
+				if (isOpenAI && !data.move && !data.switch) {
+					data = JSON.parse(data)
+				}
 				if (Object.keys(data)[0] === 'move') {
 					let pokemonMove = gameState.ai.pokemon_team[gameState.ai.active_pokemon_index].base_stats.moves[data.move]
 					// { "move": 3}
@@ -92,7 +105,12 @@ const PokemonBattle = ({
 					}, 3000)
 				}
 				if (Object.keys(data)[0] === 'switch') {
-					handleOpponentSwitch(data.switch)
+					let newSwitchMove = data.switch;
+					if (gameState.ai.fainted_pokemons.find((pokemon: any, _index: number) => _index === data.switch)) {
+						// this check is to prevent the AI from switching to a fainted pokemon
+						newSwitchMove = Math.floor(Math.random() * gameState.ai.pokemon_team.length)
+					}
+					handleOpponentSwitch(newSwitchMove)
 					setUsedAiPokemonMove('Switched Pokemon')
 					setTimeout(() => {
 						setUsedAiPokemonMove('')
@@ -103,6 +121,14 @@ const PokemonBattle = ({
   }, [gameState])
 	return (
 		<div className='flex h-[700px] w-[700px] flex-col items-center justify-center'>
+			<div className='flex items-center space-x-4 p-4'>
+				<label htmlFor='ai'>Battle ChatGPT</label>
+				<input
+					type='checkbox'
+					id='ai'
+					onChange={() => setIsOpenAI(!isOpenAI)}
+				/>
+			</div>
 			<div className='relative flex h-[30vw] w-full flex-col rounded-lg border border-black'>
 				<img
 					src='http://bit.ly/pokemonbg'
@@ -128,86 +154,88 @@ const PokemonBattle = ({
 					_speed={player ? player.base_stats.speed : 0}
 					_image={player ? player.image : ''}
 				/>
-				{
-					gameState.winner ? (
-						<div className='absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 flex items-center justify-center'>
-							<div className='text-4xl text-white'>
-								{gameState.winner === 'player' ? 'You win!' : 'You lose!'}
-							</div>
+				{gameState.winner ? (
+					<div className='absolute left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-70'>
+						<div className='text-4xl text-white'>
+							{gameState.winner === 'player' ? 'You win!' : 'You lose!'}
 						</div>
-					) : ''
-				}
-			</div>
-			<div
-				className={`grid w-full grid-cols-2 bg-neutral-800 pt-4 ${isPlayerTurn ? 'border-4 border-green-500' : ''}`}
-			>
-				<div className={`w-full `}>
-					{usedAiPokemonMove != '' ? (
-						<div id='message' className='text-2xl'>
-							{opponent?.species} used {usedAiPokemonMove}!
-						</div>
-					) : usedPlayerPokemonMove != '' ? (
-						<div id='message' className='text-2xl'>
-							{player?.species} used {usedPlayerPokemonMove}!
-						</div>
-					) : player?.species ? (
-						<div id='message' className='text-2xl'>
-							What should {player.species} do?
-						</div>
-					) : (
-						<div id='message' className='pl-2 text-2xl'>
-							Choose your pokemon
-						</div>
-					)}
-					<div className='flex w-full'>
-						<button
-							onClick={() => {
-								if (isPlayerTurn) {
-									switchPokemonMove(true)
-								}
-							}}
-							className='m-auto bg-neutral-700 py-2 hover:bg-neutral-500'
-						>
-							Switch Pokemon
-						</button>
 					</div>
-				</div>
-				<div className='grid grid-cols-2 gap-2'>
-					{player && player.base_stats.moves.length > 0 ? (
-						player.base_stats.moves.map(move => (
+				) : (
+					''
+				)}
+			</div>
+			{!gameState.winner && (
+				<div
+					className={`grid w-full grid-cols-2 bg-neutral-800 pt-4 ${isPlayerTurn ? 'border-4 border-green-500' : ''}`}
+				>
+					<div className={`w-full `}>
+						{usedAiPokemonMove != '' ? (
+							<div id='message' className='text-2xl'>
+								{opponent?.species} used {usedAiPokemonMove}!
+							</div>
+						) : usedPlayerPokemonMove != '' ? (
+							<div id='message' className='text-2xl'>
+								{player?.species} used {usedPlayerPokemonMove}!
+							</div>
+						) : player?.species ? (
+							<div id='message' className='text-2xl'>
+								What should {player.species} do?
+							</div>
+						) : (
+							<div id='message' className='pl-2 text-2xl'>
+								Choose your pokemon
+							</div>
+						)}
+						<div className='flex w-full'>
 							<button
-								key={move.name}
-								className={`size-full py-2 ${isPlayerTurn ? 'bg-neutral-700 hover:bg-neutral-500' : 'bg-neutral-800'}`}
 								onClick={() => {
-									setUsedPlayerPokemonMove(move.name)
-									handlePlayerMove(move)
-									setTimeout(() => {
-										setUsedPlayerPokemonMove('')
-									}, 3000)
+									if (isPlayerTurn) {
+										switchPokemonMove(true)
+									}
 								}}
-								disabled={!isPlayerTurn}
+								className='m-auto bg-neutral-700 py-2 hover:bg-neutral-500'
 							>
-								{move.name}
+								Switch Pokemon
 							</button>
-						))
-					) : (
-						<>
-							{new Array(4).fill(0).map((_, i) => (
+						</div>
+					</div>
+					<div className='grid grid-cols-2 gap-2'>
+						{player && player.base_stats.moves.length > 0 ? (
+							player.base_stats.moves.map((move, _index) => (
 								<button
-									key={i}
-									className='size-full bg-neutral-700 py-2'
-									disabled
+									key={move.name + _index}
+									className={`size-full py-2 ${isPlayerTurn ? 'bg-neutral-700 hover:bg-neutral-500' : 'bg-neutral-800'}`}
+									onClick={() => {
+										setUsedPlayerPokemonMove(move.name)
+										handlePlayerMove(move)
+										setTimeout(() => {
+											setUsedPlayerPokemonMove('')
+										}, 3000)
+									}}
+									disabled={!isPlayerTurn}
 								>
-									N/A
+									{move.name}
 								</button>
-							))}
-						</>
-					)}
-				</div>
-				{/* <div className='continue'>
+							))
+						) : (
+							<>
+								{new Array(4).fill(0).map((_, i) => (
+									<button
+										key={i}
+										className='size-full bg-neutral-700 py-2'
+										disabled
+									>
+										N/A
+									</button>
+								))}
+							</>
+						)}
+					</div>
+					{/* <div className='continue'>
 					<button onclick='compPokemon()'>Continue</button>
 				</div> */}
-			</div>
+				</div>
+			)}
 		</div>
 	)
 }

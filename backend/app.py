@@ -4,6 +4,14 @@ import os
 from game import bestMove
 from flask_cors import CORS
 import json
+from openai import OpenAI
+
+load_dotenv()
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# organization=os.getenv("OPENAI_ORG_ID"),
+# project=os.getenv("OPENAI_PROJECT_ID"),
+
 
 app = Flask(__name__, static_url_path='', static_folder="static/dist", template_folder="./templates")
 CORS(app)
@@ -62,7 +70,46 @@ def runAI():
         return jsonify(theMove)
         # return jsonify({"move": 3})
 
-load_dotenv()
+def remove_json_block(json_string):
+    # Find the index of the first '{' and the last '}'
+    start_index = json_string.find('{')
+    end_index = json_string.rfind('}')
+
+    # Extract the content between the curly braces
+    content = json_string[start_index:end_index + 1]
+
+    return content
+
+@app.route("/openai", methods=['POST'])
+def openAI():
+    systemPrompt1 = "here is gameState for a pokemon battle you will figure out the best move to take against the other player, you are ai and you will only return {“move”: 0-3} or {“switch”: 0-2}, the move will be from the moveset of the active pokemon and switch will be which pokemon to switch to, remember to choose the strongest move:"
+    systemPrompt2 = "You are a pokemon master that will choose the best move from the AI player with given gamestate of a pokemon battle you will return a json object containing only which pokemon move you would choose from the active pokemon memebers from the team, or you will choose to switch to a different pokemon indicating which index from the pokemon team array. you will return move: 0-3 or switch: 0-2"
+    if request.method == 'POST':
+        if not request.is_json:
+            return jsonify({"error": "Request must be JSON"}), 400
+        data = request.get_json()
+        # print("printing data from request")
+        if data is None:
+            print("data is none")
+            return jsonify({"error": "Request must be JSON"}), 400
+        # print(data)
+        theMove = client.chat.completions.create(model="gpt-3.5-turbo-0125", 
+            messages=[{"role": "system", "content": systemPrompt1},
+                    {"role": "user", "content": json.dumps(data)},
+                ])
+        # theMove = theMove.model_dump_json() 
+        
+        # try :
+            
+        # except Exception as e:
+        #     print(e)
+        #     theMove = {"error": "An error occurred"}
+        # print(theMove.choices[0].message.content)
+        # return theMove.choices[0].message.content
+        # return jsonify({"move": 3})
+        print(remove_json_block(theMove.choices[0].message.content))
+        return json.dumps(remove_json_block(theMove.choices[0].message.content))
+
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5003))

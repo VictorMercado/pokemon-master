@@ -21,6 +21,7 @@ export default function App(): ReactElement {
 	const canvasRef = useRef<HTMLCanvasElement>(null)
 	const [playerSwitch, setPlayerSwitch] = useState(false)
 	const [input, setInput] = useState('')
+	const [logs, setLogs] = useState([] as string[])
 
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['pokemon'],
@@ -52,23 +53,60 @@ export default function App(): ReactElement {
 		})
 	const getLivePokemon = (whichPlayer: string) => {
 		// @ts-ignore
+		const faintedPokemons = gameState[whichPlayer].fainted_pokemons
+		// @ts-ignore
 		return gameState[whichPlayer].pokemon_team.filter(
-			(pokemon: TPokemon) => pokemon.current_hp > 0
-		)
+			(pokemon: TPokemon, _index: number) => {
+				return !faintedPokemons.includes(_index)
+			})
 	}
 	const handleOpponentSwitch = (switchPokemonIndex : number) => {
+		const faintedPokemons = gameState.ai.fainted_pokemons
+		let switchPokemon = switchPokemonIndex;
+		if (faintedPokemons.includes(switchPokemonIndex)) {
+			switchPokemon = getLivePokemon("ai").indexOf(getLivePokemon('ai')[0])
+		}
+		if (switchPokemon === undefined) {
+			setLogs([
+				...logs,
+				"Opponent failed to switch"
+			])
+		} else {
+			setLogs([
+				...logs,
+				`Opponent switched to ${gameState.ai.pokemon_team[switchPokemon].species}`
+			])
+		}
 		setGameState(prev => {
 			return {
 				...prev,
 				ai: {
 					...prev.ai,
-					active_pokemon_index: switchPokemonIndex
+					active_pokemon_index: switchPokemon
 				},
 				turn_order: 'player'
 			}
 		})
 	}
 
+	const handlePlayerSwitch = (switchPokemonIndex : number) => {
+		const faintedPokemons = gameState.player.fainted_pokemons
+		let switchPokemon = switchPokemonIndex;
+		if (faintedPokemons.includes(switchPokemonIndex)) {
+			switchPokemon = getLivePokemon("player").indexOf(getLivePokemon('player')[Math.floor(Math.random() * getLivePokemon('player').length)])
+		}
+		setLogs([...logs, `Player switched to ${gameState.player.pokemon_team[switchPokemon].species}`])
+		setGameState(prev => {
+			return {
+				...prev,
+				player: {
+					...prev.player,
+					active_pokemon_index: switchPokemon
+				},
+				turn_order: 'ai'
+			}
+		})
+	}
 
 	const handlePlayerMove = (playerMove: { name: string; type: string; power: number }) => {
 		let opponentActive = gameState.ai.pokemon_team[gameState.ai.active_pokemon_index]
@@ -76,9 +114,16 @@ export default function App(): ReactElement {
 		if (playerMove.power > opponentActive.current_hp) {
 			dmg = opponentActive.current_hp
 		}
-		if (opponentActive.current_hp <= 0) {
-			return
-		}
+		// if (opponentActive.current_hp <= 0) {
+		// 	setGameState(prev => {
+		// 		return {
+		// 			...prev,
+		// 			turn_order: 'ai'
+		// 		}
+		// 	})
+		// 	return
+		// }
+		setLogs([...logs, JSON.stringify({ player: playerMove })])
 		setGameState(prev => {
 			return {
 				...prev,
@@ -105,9 +150,16 @@ export default function App(): ReactElement {
 		if (playerMove.power > playerActive.current_hp) {
 			dmg = playerActive.current_hp
 		}
-		if (playerActive.current_hp <= 0) {
-			return
-		}
+		// if (playerActive.current_hp <= 0) {
+		// 	setGameState(prev => {
+		// 		return {
+		// 			...prev,
+		// 			turn_order: 'player'
+		// 		}
+		// 	})
+		// 	return
+		// }
+		setLogs([...logs, JSON.stringify({ ai: playerMove })])
 		setGameState(prev => {
 			return {
 				...prev,
@@ -129,6 +181,25 @@ export default function App(): ReactElement {
 	}
 
 	const handleOpponentRemove = () => {
+		if (getLivePokemon("ai").length === 1) {
+			setGameState(prev => {
+				return {
+					...prev,
+					ai: {
+						...prev.ai,
+						fainted_pokemons: [
+							...prev.ai.fainted_pokemons,
+							prev.ai.active_pokemon_index
+						]
+					},
+					// winner: 'player'
+				}
+			})
+		}
+		let nextLivePokemonIndex = getLivePokemon('ai').length > 0 ? gameState.ai.pokemon_team.indexOf(getLivePokemon('ai')[0]) : 0
+		if (nextLivePokemonIndex === gameState.ai.active_pokemon_index) {
+			nextLivePokemonIndex = gameState.ai.pokemon_team.indexOf(getLivePokemon('ai')[1])
+		}
 		setGameState({
 			...gameState,
 			ai: {
@@ -137,11 +208,35 @@ export default function App(): ReactElement {
 					...gameState.ai.fainted_pokemons,
 					gameState.ai.active_pokemon_index
 				],
-				active_pokemon_index: getLivePokemon('ai').length > 0 ? gameState.ai.pokemon_team.indexOf(getLivePokemon('ai')[0]) : 0
+				active_pokemon_index: nextLivePokemonIndex
 			}
 		})
 	}
 	const handlePlayerRemove = () => {
+		if (getLivePokemon('player').length === 1) {
+			setGameState(prev => {
+				return {
+					...prev,
+					player: {
+						...prev.player,
+						fainted_pokemons: [
+							...prev.player.fainted_pokemons,
+							prev.player.active_pokemon_index
+						]
+					},
+					// winner: 'ai'
+				}
+			})
+		}
+		let nextLivePokemonIndex =
+			getLivePokemon('player').length > 0
+				? gameState.player.pokemon_team.indexOf(getLivePokemon('player')[0])
+				: 0
+		if (nextLivePokemonIndex === gameState.player.active_pokemon_index) {
+			nextLivePokemonIndex = gameState.player.pokemon_team.indexOf(
+				getLivePokemon('player')[1]
+			)
+		}
 		setGameState({
 			...gameState,
 			player: {
@@ -150,10 +245,29 @@ export default function App(): ReactElement {
 					...gameState.player.fainted_pokemons,
 					gameState.player.active_pokemon_index
 				],
-				active_pokemon_index: getLivePokemon('player').length > 0 ? gameState.player.pokemon_team.indexOf(getLivePokemon('player')[0]) : 0
+				active_pokemon_index: nextLivePokemonIndex
 			}
 		})
 	}
+	useEffect(() => {
+		// alert(gameState.ai.fainted_pokemons.length)
+		// alert(gameState.player.fainted_pokemons.length)
+		if (gameState.ai.fainted_pokemons.length === 3) {
+			setGameState({
+				...gameState,
+				winner: 'player'
+			})
+		} else if (gameState.player.fainted_pokemons.length === 3) {
+			setGameState({
+				...gameState,
+				winner: 'ai'
+			})
+		}
+	}, [
+		gameState.ai.fainted_pokemons.length,
+		gameState.player.fainted_pokemons.length,
+	])
+
 	useEffect(() => {
 		if (isLoading) return
 		if (error) return
@@ -409,7 +523,7 @@ export default function App(): ReactElement {
 							<div>Error: {error.message}</div>
 						) : (
 							<div className='flex w-full flex-col space-y-8'>
-								{getLivePokemon('ai').map((pokemon : any, _index: number) => (
+								{getLivePokemon('ai').map((pokemon: any, _index: number) => (
 									<div
 										className='flex flex-col space-y-2 border text-sm'
 										key={_index}
@@ -437,16 +551,54 @@ export default function App(): ReactElement {
 							</div>
 						)}
 					</div>
+					<p className='text-center'>Fainted Pokemon</p>
+					<div className='flex flex-col space-y-2 text-sm'>
+						{gameState.ai.fainted_pokemons.map(index => {
+							return (
+								<div className='border p-2' key={index}>
+									<div className='flex items-center justify-center '>
+										<img
+											className='h-24 w-24'
+											src={gameState.ai.pokemon_team[index]?.image}
+										/>
+										<div
+											className='p-4'
+											key={gameState.ai.pokemon_team[index]?.species}
+										>
+											<p>name: {gameState.ai.pokemon_team[index]?.species}</p>
+											<p>
+												hp: {gameState.ai.pokemon_team[index]?.base_stats.hp}
+											</p>
+											<p>
+												speed:{' '}
+												{gameState.ai.pokemon_team[index]?.base_stats.speed}
+											</p>
+										</div>
+									</div>
+								</div>
+							)
+						})}
+					</div>
 				</div>
 				<div>
-					<div className="mt-4 flex justify-center">it is {gameState.turn_order}s turn</div>
+					<div
+						className={`mt-4 flex justify-center border-2 p-2 ${gameState.turn_order === 'player' ? 'border-green-500' : 'border-red-500'}`}
+					>
+						{gameState.turn_order}s turn
+					</div>
 					<PokemonBattle
 						gameState={gameState}
 						opponent={
-							gameState.winner === "" ? gameState.ai.pokemon_team[gameState.ai.active_pokemon_index] : undefined
+							gameState.winner === ''
+								? gameState.ai.pokemon_team[gameState.ai.active_pokemon_index]
+								: undefined
 						}
 						player={
-							gameState.winner === "" ? gameState.player.pokemon_team[gameState.player.active_pokemon_index] : undefined
+							gameState.winner === ''
+								? gameState.player.pokemon_team[
+										gameState.player.active_pokemon_index
+									]
+								: undefined
 						}
 						handlePlayerMove={handlePlayerMove}
 						handleOpponentMove={handleOpponentMove}
@@ -455,13 +607,12 @@ export default function App(): ReactElement {
 						switchPokemonMove={setPlayerSwitch}
 						handleOpponentSwitch={handleOpponentSwitch}
 					/>
-					<div className='relative'>
-						<canvas
-							ref={canvasRef}
-							width='700'
-							height='700'
-							className=' bg-neutral-600'
-						></canvas>
+					<div className='flex flex-col'>
+						{logs.map((log, index) => (
+							<div key={index} className='p-2'>
+								{log}
+							</div>
+						))}
 					</div>
 				</div>
 				<div className='flex w-[500px] flex-col'>
@@ -473,7 +624,7 @@ export default function App(): ReactElement {
 							<div>Error: {error.message}</div>
 						) : (
 							<div className='flex w-full flex-col space-y-8'>
-								{getLivePokemon("player")?.map((pokemon : any) => (
+								{getLivePokemon('player')?.map((pokemon: any) => (
 									<div
 										key={pokemon.species}
 										className={`flex flex-col space-y-2 border text-sm ${playerSwitch ? 'cursor-pointer border-4 border-green-500' : ''}`}
@@ -505,17 +656,50 @@ export default function App(): ReactElement {
 											</div>
 										</div>
 										<div className='grid grid-cols-2 gap-2'>
-											{pokemon.base_stats.moves.map((move: any) => (
-												<div key={move.name} className='border p-2'>
-													<p>{move.name}</p>
-													<p>dmg: {move.power}</p>
-												</div>
-											))}
+											{pokemon.base_stats.moves.map(
+												(move: any, _index: number) => (
+													<div key={move.name + _index} className='border p-2'>
+														<p>{move.name}</p>
+														<p>dmg: {move.power}</p>
+													</div>
+												)
+											)}
 										</div>
 									</div>
 								))}
 							</div>
 						)}
+					</div>
+					<p className='text-center'>Fainted Pokemon</p>
+					<div className='flex flex-col space-y-2 text-sm'>
+						{gameState.player.fainted_pokemons.map(index => {
+							return (
+								<div className='border p-2' key={index}>
+									<div className='flex items-center justify-center '>
+										<img
+											className='h-24 w-24'
+											src={gameState.player.pokemon_team[index]?.image}
+										/>
+										<div
+											className='p-4'
+											key={gameState.player.pokemon_team[index]?.species}
+										>
+											<p>
+												name: {gameState.player.pokemon_team[index]?.species}
+											</p>
+											<p>
+												hp:{' '}
+												{gameState.player.pokemon_team[index]?.base_stats.hp}
+											</p>
+											<p>
+												speed:{' '}
+												{gameState.player.pokemon_team[index]?.base_stats.speed}
+											</p>
+										</div>
+									</div>
+								</div>
+							)
+						})}
 					</div>
 				</div>
 			</div>
