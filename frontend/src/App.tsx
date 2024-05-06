@@ -34,6 +34,8 @@ export default function App(): ReactElement {
 	const [playerSwitch, setPlayerSwitch] = useState(false)
 	const [input, setInput] = useState('')
 	const [logs, setLogs] = useState([] as string[])
+	const [isOpponentSelectDisabled, setIsOpponentSelectDisabled] = useState(true)
+	const [isPlayerSelectDisabled, setIsPlayerSelectDisabled] = useState(true)
 	const [agents, setAgents] = useState<AgentURLs>({
 		player: {
 			url: 'none'
@@ -142,7 +144,20 @@ export default function App(): ReactElement {
 		// 	})
 		// 	return
 		// }
-		setLogs([...logs, JSON.stringify({ player: playerMove })])
+		setLogs([
+			...logs,
+			JSON.stringify({
+				player: {
+					name: playerMove.name,
+					type: playerMove.type,
+					power:
+						playerMove.power * // @ts-ignore
+						TYPE_CHART[playerMove.type][
+							gameState.ai.pokemon_team[gameState.ai.active_pokemon_index].type
+						]
+				}
+			})
+		])
 		setGameState(prev => {
 			return {
 				...prev,
@@ -178,7 +193,11 @@ export default function App(): ReactElement {
 		// 	})
 		// 	return
 		// }
-		setLogs([...logs, JSON.stringify({ ai: playerMove })])
+		setLogs([...logs, JSON.stringify({ ai: {
+			name: playerMove.name,
+			type: playerMove.type, // @ts-ignore
+			power: playerMove.power * TYPE_CHART[playerMove.type][gameState.player.pokemon_team[gameState.player.active_pokemon_index].type]
+		} })])
 		setGameState(prev => {
 			return {
 				...prev,
@@ -350,104 +369,6 @@ export default function App(): ReactElement {
 		})()
 	}, [data])
 
-	// useEffect(() => {
-	// 	if (!canvasRef.current) return
-	// 	let scale = 1.0
-	// 	const canvas = canvasRef.current
-
-	// 	const ctx = canvas.getContext('2d')
-
-	// 	function renderNode(node, x, y, xOffset) {
-	// 		if (!ctx) return
-	// 		ctx.beginPath()
-	// 		ctx.arc(x, y, 20 * scale, 0, Math.PI * 2)
-	// 		ctx.fillStyle = 'lightblue'
-	// 		ctx.fill()
-	// 		ctx.strokeStyle = 'black'
-	// 		ctx.stroke()
-	// 		ctx.fillStyle = 'black'
-	// 		ctx.textAlign = 'center'
-	// 		ctx.font = 20 * scale + 'px Arial'
-	// 		ctx.fillText(node.value, x, y + 5)
-
-	// 		node.children.forEach((child, index) => {
-	// 			const angle = Math.PI / 4 // Angle between each child
-	// 			const childX = x + xOffset * Math.cos(angle * (index - 2))
-	// 			const childY = y + 50 // Adjust the distance between levels
-
-	// 			// ctx.beginPath()
-	// 			// ctx.moveTo(x, y + 20)
-	// 			// ctx.lineTo(childX, childY - 20)
-	// 			// ctx.stroke()
-
-	// 			renderNode(child, childX, childY, xOffset)
-	// 		})
-	// 	}
-
-	// 	function renderTree(rootNode, canvasWidth) {
-	// 		const rootX = canvasWidth / 2
-	// 		const rootY = 50
-	// 		const xOffset = 200 // Initial offset for root node
-
-	// 		renderNode(rootNode, rootX, rootY, xOffset)
-	// 	}
-
-	// 	// Define tree structure
-	// 	const rootNode = {
-	// 		value: 'Root',
-	// 		children: [
-	// 			{ value: 'Child 1', children: [] },
-	// 			{ value: 'Child 2', children: [] },
-	// 			{ value: 'Child 3', children: [] },
-	// 			{ value: 'Child 4', children: [] },
-	// 			{
-	// 				value: 'Child 5',
-	// 				children: [
-	// 					{ value: 'SubChild 5.1', children: [] },
-	// 					{ value: 'SubChild 5.2', children: [] },
-	// 					{ value: 'SubChild 5.3', children: [] },
-	// 					{ value: 'SubChild 5.4', children: [] },
-	// 					{ value: 'SubChild 5.5', children: [] }
-	// 				]
-	// 			}
-	// 		]
-	// 	}
-
-	// 	// Render the tree
-	// 	renderTree(rootNode, canvas.width)
-	// 	canvas.addEventListener('mouseover', (event) => {
-	// 		console.log('mouseover event')
-
-	// 		document.addEventListener(
-	// 			'wheel',
-	// 			event => {
-	// 				// event.preventDefault()
-	// 				console.log('wheel event')
-
-	// 				const delta = event.deltaY / 100
-	// 				scale += delta
-
-	// 				// Limit scale within certain bounds
-	// 				// if (scale < 0.5) scale = 0.5
-	// 				// if (scale > 2.0) scale = 2.0
-	// 				ctx?.reset()
-	// 				renderTree(rootNode, canvas.width + scale * 100)
-	// 			},
-	// 			{ passive: true }
-	// 		)
-	// 	})
-	// 	canvas.addEventListener('mouseout', () => {
-	// 		console.log('mouseout event')
-	// 		document.removeEventListener('wheel', () => {})
-	// 	})
-	// 	return () => {
-	// 		canvas.removeEventListener('mouseover', () => {})
-	// 		document.removeEventListener('wheel', () => {})
-	// 	}
-	// }, [canvasRef.current])
-	// useEffect(() => {
-
-	// }, [gameState])
 	if (
 		gameState.player.pokemon_team.length > 0 &&
 		gameState.player.pokemon_team[gameState.player.active_pokemon_index]?.current_hp <= 0 
@@ -462,6 +383,13 @@ export default function App(): ReactElement {
 	) {
 		handleOpponentRemove()
 	}
+	useEffect(() => {
+		if (gameState.player.pokemon_team.length === 3 ) {
+			setIsPlayerSelectDisabled(false)
+			setIsOpponentSelectDisabled(false)
+		}
+	})
+
 	return (
 		<div className='flex flex-col'>
 			{/* Pokemon search */}
@@ -573,6 +501,7 @@ export default function App(): ReactElement {
 									}
 								})
 							}}
+							disabled={isOpponentSelectDisabled}
 						>
 							<option value={GPTURL}>GPT-4</option>
 							<option value={MINMAXURL}>MinMax</option>
@@ -704,6 +633,7 @@ export default function App(): ReactElement {
 									}
 								})
 							}}
+							disabled={isPlayerSelectDisabled}
 						>
 							<option value='none'>You</option>
 							<option value={GPTURL}>GPT-4</option>

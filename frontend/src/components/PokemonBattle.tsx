@@ -141,13 +141,25 @@ const PokemonBattle = ({
 				return
 			}
 			if (gameState.turn_order === 'player' && agents.player.url !== 'none') {
+				const alteredGameState = {
+					...gameState,
+					turn_order: 'ai',
+					player: {
+						...gameState.ai,
+						pokemon_team: gameState.player.pokemon_team
+					},
+					ai: {
+						...gameState.player,
+						pokemon_team: gameState.player.pokemon_team
+					}
+				}
 				const isOpenAI = agents.player.url.includes('openai')
 				let response = await fetch(agents.player.url, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
 					},
-					body: JSON.stringify(gameState)
+					body: JSON.stringify(alteredGameState)
 				})
 				let data = await response.json()
 				console.log(data)
