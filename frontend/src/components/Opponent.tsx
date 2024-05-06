@@ -33,7 +33,7 @@ const Opponent = ({ _name, _hp, _current_hp, _attack, _defense, _speed,_image} :
 				{/* stats */}
 
 				{/* sprite */}
-				<div className='flex h-72 w-72 items-end justify-center pr-6'>
+				<div className='flex h-72 w-72 items-end justify-center pr-6 pb-8'>
 					{_image && <img className='h-32 w-32' src={_image} />}
 				</div>
 				{/* sprite */}

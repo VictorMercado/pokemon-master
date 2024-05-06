@@ -7,6 +7,7 @@ import { getAllTestPokemon } from 'api/getAllTestPokemon'
 import { getRandomPokemonMoves } from 'api/getRandomPokemonMoves'
 import { type TPokemon } from 'types'
 import { getPokemon } from 'api/getPokemon'
+import { TYPE_CHART, AgentURLs } from 'types'
 
 const getRandomPokemon = (data: any) => {
 	const randomIndex = Math.floor(Math.random() * data.length)
@@ -17,12 +18,30 @@ const getScaledHp = (hp: number) => {
 	return ((2*hp) + 100)
 }
 
+// const GPTURL = 'http://127.0.0.1:5000/openai' 
+const GPTURL = 'https://pokemon-master-production.up.railway.app/openai'
+
+// const MINMAXURL = 'http://127.0.0.1:5000/ai' 
+const MINMAXURL = 'https://pokemon-master-production.up.railway.app/ai'
+
+// const BETTERMINMAXURL = 'http://127.0.0.1:5000/ai2'
+const BETTERMINMAXURL = 'https://pokemon-master-production.up.railway.app/ai2'
+
+
+
 export default function App(): ReactElement {
 	const canvasRef = useRef<HTMLCanvasElement>(null)
 	const [playerSwitch, setPlayerSwitch] = useState(false)
 	const [input, setInput] = useState('')
 	const [logs, setLogs] = useState([] as string[])
-
+	const [agents, setAgents] = useState<AgentURLs>({
+		player: {
+			url: 'none'
+		},
+		ai: {
+			url: GPTURL
+		}
+	})
 	const { data, isLoading, error } = useQuery({
 		queryKey: ['pokemon'],
 		queryFn: getAllPokemon
@@ -132,8 +151,8 @@ export default function App(): ReactElement {
 					pokemon_team: prev.ai.pokemon_team.map((pokemon, index) => {
 						if (index === prev.ai.active_pokemon_index) {
 							return {
-								...pokemon,
-								current_hp: pokemon.current_hp - dmg
+								...pokemon, // @ts-ignore
+								current_hp: pokemon.current_hp - (dmg * TYPE_CHART[playerMove.type][prev.ai.pokemon_team[prev.ai.active_pokemon_index].type])
 							}
 						}
 						return pokemon
@@ -168,8 +187,8 @@ export default function App(): ReactElement {
 					pokemon_team: prev.player.pokemon_team.map((pokemon, index) => {
 						if (index === prev.player.active_pokemon_index) {
 							return {
-								...pokemon,
-								current_hp: pokemon.current_hp - dmg
+								...pokemon, // @ts-ignore
+								current_hp: pokemon.current_hp - (dmg * TYPE_CHART[playerMove.type][prev.player.pokemon_team[prev.player.active_pokemon_index].type])
 							}
 						}
 						return pokemon
@@ -249,6 +268,7 @@ export default function App(): ReactElement {
 			}
 		})
 	}
+	// check for winner
 	useEffect(() => {
 		// alert(gameState.ai.fainted_pokemons.length)
 		// alert(gameState.player.fainted_pokemons.length)
@@ -267,7 +287,7 @@ export default function App(): ReactElement {
 		gameState.ai.fainted_pokemons.length,
 		gameState.player.fainted_pokemons.length,
 	])
-
+	// load AI pokemon
 	useEffect(() => {
 		if (isLoading) return
 		if (error) return
@@ -292,6 +312,7 @@ export default function App(): ReactElement {
 					fainted_pokemons: [],
 					pokemon_team: [
 						{
+							type: pokemon1.types[0].type.name,
 							image: `https://img.pokemondb.net/sprites/black-white/anim/${Math.random() < 0.03 ? 'shiny' : 'normal'}/${pokemon1.name}.gif`,
 							species: pokemon1.name,
 							current_hp: getScaledHp(pokemon1.stats[0].base_stat),
@@ -302,6 +323,7 @@ export default function App(): ReactElement {
 							}
 						},
 						{
+							type: pokemon2.types[0].type.name,
 							image: `https://img.pokemondb.net/sprites/black-white/anim/${Math.random() < 0.03 ? 'shiny' : 'normal'}/${pokemon2.name}.gif`,
 							species: pokemon2.name,
 							current_hp: getScaledHp(pokemon2.stats[0].base_stat),
@@ -312,6 +334,7 @@ export default function App(): ReactElement {
 							}
 						},
 						{
+							type: pokemon3.types[0].type.name,
 							image: `https://img.pokemondb.net/sprites/black-white/anim/${Math.random() < 0.03 ? 'shiny' : 'normal'}/${pokemon3.name}.gif`,
 							species: pokemon3.name,
 							current_hp: getScaledHp(pokemon3.stats[0].base_stat),
@@ -422,13 +445,30 @@ export default function App(): ReactElement {
 	// 		document.removeEventListener('wheel', () => {})
 	// 	}
 	// }, [canvasRef.current])
+	// useEffect(() => {
 
+	// }, [gameState])
+	if (
+		gameState.player.pokemon_team.length > 0 &&
+		gameState.player.pokemon_team[gameState.player.active_pokemon_index]?.current_hp <= 0 
+		&& gameState.winner === ''
+	) {
+		handlePlayerRemove()
+	}
+	if (
+		gameState.ai.pokemon_team.length > 0 &&
+		gameState.ai.pokemon_team[gameState.ai.active_pokemon_index]?.current_hp <=0 
+		&& gameState.winner === ''
+	) {
+		handleOpponentRemove()
+	}
 	return (
 		<div className='flex flex-col'>
+			{/* Pokemon search */}
 			<div className='container m-auto flex flex-col items-center justify-center'>
 				<h1>Pokémon Search</h1>
 				<p>
-					Search for Pokémon to see their sprites, moves, and their base stats
+					Choose your Pokémon team first before doing anything!
 				</p>
 				<div className='flex justify-center'>
 					<div className='relative inline-block'>
@@ -440,7 +480,7 @@ export default function App(): ReactElement {
 							autoComplete='off'
 							className='h-10 w-96 rounded-md border-2 border-black p-2 text-black'
 						/>
-						<div className='absolute left-[-75px] z-50 w-[500px] rounded-sm border border-b-0 border-t-0 bg-black'>
+						<div className='absolute z-50 w-[500px] rounded-sm border border-b-0 border-t-0 bg-black'>
 							{filteredData?.map((pokemon: any) => (
 								<button
 									key={pokemon.name}
@@ -480,6 +520,7 @@ export default function App(): ReactElement {
 												pokemon_team: [
 													...gameState.player.pokemon_team,
 													{
+														type: pokemon.types[0].type.name,
 														altImage: `https://img.pokemondb.net/sprites/black-white/anim/${Math.random() < 0.03 ? 'shiny' : 'normal'}/${pokemon.name}.gif`,
 														image: `https://img.pokemondb.net/sprites/black-white/anim/${Math.random() < 0.03 ? 'back-shiny' : 'back-normal'}/${pokemon.name}.gif`,
 														species: pokemon.name,
@@ -513,8 +554,31 @@ export default function App(): ReactElement {
 					</div>
 				</div>
 			</div>
-			<div className='flex justify-center'>
+			{/* Main container */}
+			<div className='flex flex-col justify-center md:flex-row'>
+				{/* AI POKEMON */}
 				<div className='flex w-[500px] flex-col'>
+					<div className='flex items-center justify-center space-x-4'>
+						<label htmlFor='opponent'>Choose your opponent</label>
+						<select
+							name='opponent'
+							id='opponent'
+							className='text-black'
+							value={agents.ai.url}
+							onChange={e => {
+								setAgents({
+									...agents,
+									ai: {
+										url: e.target.value
+									}
+								})
+							}}
+						>
+							<option value={GPTURL}>GPT-4</option>
+							<option value={MINMAXURL}>MinMax</option>
+							<option value={BETTERMINMAXURL}>BetterMinMax</option>
+						</select>
+					</div>
 					<h1 className='text-center text-2xl font-bold'>Opponent</h1>
 					<div className='flex p-2'>
 						{isLoading ? (
@@ -525,13 +589,14 @@ export default function App(): ReactElement {
 							<div className='flex w-full flex-col space-y-8'>
 								{getLivePokemon('ai').map((pokemon: any, _index: number) => (
 									<div
-										className='flex flex-col space-y-2 border text-sm'
+										className='flex flex-col space-y-2 border bg-green-500/25 text-sm'
 										key={_index}
 									>
 										<div className='flex items-center justify-center '>
 											<img className='h-24 w-24' src={pokemon?.image} />
 											<div className='p-4' key={pokemon.species}>
 												<p>name: {pokemon.species}</p>
+												<p>type: {pokemon.type}</p>
 												<p>hp: {pokemon.base_stats.hp}</p>
 												<p>speed: {pokemon.base_stats.speed}</p>
 											</div>
@@ -542,6 +607,7 @@ export default function App(): ReactElement {
 													<div key={_index} className='border p-2'>
 														<p>{move.name}</p>
 														<p>dmg: {move.power}</p>
+														<p>type: {move.type}</p>
 													</div>
 												)
 											)}
@@ -555,7 +621,7 @@ export default function App(): ReactElement {
 					<div className='flex flex-col space-y-2 text-sm'>
 						{gameState.ai.fainted_pokemons.map(index => {
 							return (
-								<div className='border p-2' key={index}>
+								<div className='border bg-red-500/25 p-2' key={index}>
 									<div className='flex items-center justify-center '>
 										<img
 											className='h-24 w-24'
@@ -566,6 +632,7 @@ export default function App(): ReactElement {
 											key={gameState.ai.pokemon_team[index]?.species}
 										>
 											<p>name: {gameState.ai.pokemon_team[index]?.species}</p>
+											<p>type: {gameState.ai.pokemon_team[index]?.type}</p>
 											<p>
 												hp: {gameState.ai.pokemon_team[index]?.base_stats.hp}
 											</p>
@@ -580,13 +647,15 @@ export default function App(): ReactElement {
 						})}
 					</div>
 				</div>
-				<div>
+				{/* POKEMON BATTLE DISPLAY */}
+				<div className='flex flex-col items-center justify-center'>
 					<div
 						className={`mt-4 flex justify-center border-2 p-2 ${gameState.turn_order === 'player' ? 'border-green-500' : 'border-red-500'}`}
 					>
 						{gameState.turn_order}s turn
 					</div>
 					<PokemonBattle
+						agents={agents}
 						gameState={gameState}
 						opponent={
 							gameState.winner === ''
@@ -606,7 +675,9 @@ export default function App(): ReactElement {
 						handlePlayerPokemonRemove={handlePlayerRemove}
 						switchPokemonMove={setPlayerSwitch}
 						handleOpponentSwitch={handleOpponentSwitch}
+						handlePlayerSwitch={handlePlayerSwitch}
 					/>
+					{/* Logs */}
 					<div className='flex flex-col'>
 						{logs.map((log, index) => (
 							<div key={index} className='p-2'>
@@ -615,7 +686,31 @@ export default function App(): ReactElement {
 						))}
 					</div>
 				</div>
+
+				{/* PLAYER POKEMON */}
 				<div className='flex w-[500px] flex-col'>
+					<div className='flex items-center justify-center space-x-4'>
+						<label htmlFor='player'>Choose your player</label>
+						<select
+							name='player'
+							id='player'
+							className='text-black'
+							value={agents.player.url}
+							onChange={e => {
+								setAgents({
+									...agents,
+									player: {
+										url: e.target.value
+									}
+								})
+							}}
+						>
+							<option value='none'>You</option>
+							<option value={GPTURL}>GPT-4</option>
+							<option value={MINMAXURL}>MinMax</option>
+							<option value={BETTERMINMAXURL}>BetterMinMax</option>
+						</select>
+					</div>
 					<h1 className='text-center text-2xl font-bold'>Player</h1>
 					<div className='flex p-2'>
 						{isLoading ? (
@@ -627,7 +722,7 @@ export default function App(): ReactElement {
 								{getLivePokemon('player')?.map((pokemon: any) => (
 									<div
 										key={pokemon.species}
-										className={`flex flex-col space-y-2 border text-sm ${playerSwitch ? 'cursor-pointer border-4 border-green-500' : ''}`}
+										className={`flex flex-col space-y-2 border bg-green-500/25 text-sm ${playerSwitch ? 'cursor-pointer border-4 border-green-500' : ''}`}
 										onClick={() => {
 											if (playerSwitch) {
 												setGameState({
@@ -651,6 +746,7 @@ export default function App(): ReactElement {
 											/>
 											<div className='p-4' key={pokemon.species}>
 												<p>name: {pokemon.species}</p>
+												<p>type: {pokemon.type}</p>
 												<p>hp: {pokemon.base_stats.hp}</p>
 												<p>speed: {pokemon.base_stats.speed}</p>
 											</div>
@@ -661,6 +757,7 @@ export default function App(): ReactElement {
 													<div key={move.name + _index} className='border p-2'>
 														<p>{move.name}</p>
 														<p>dmg: {move.power}</p>
+														<p>type: {move.type}</p>
 													</div>
 												)
 											)}
@@ -674,7 +771,7 @@ export default function App(): ReactElement {
 					<div className='flex flex-col space-y-2 text-sm'>
 						{gameState.player.fainted_pokemons.map(index => {
 							return (
-								<div className='border p-2' key={index}>
+								<div className='border bg-red-500/25 p-2' key={index}>
 									<div className='flex items-center justify-center '>
 										<img
 											className='h-24 w-24'
@@ -687,6 +784,7 @@ export default function App(): ReactElement {
 											<p>
 												name: {gameState.player.pokemon_team[index]?.species}
 											</p>
+											<p>name: {gameState.player.pokemon_team[index]?.type}</p>
 											<p>
 												hp:{' '}
 												{gameState.player.pokemon_team[index]?.base_stats.hp}

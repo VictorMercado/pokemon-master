@@ -2,7 +2,8 @@ from flask import Flask, render_template, send_from_directory, request, jsonify
 from dotenv import load_dotenv
 import os
 from game import bestMove
-from flask_cors import CORS
+from game2 import bestMove as bestMove2
+from flask_cors import CORS, cross_origin
 import json
 from openai import OpenAI
 
@@ -50,6 +51,7 @@ def hello_world():
 
 
 @app.route("/ai", methods=['POST'])
+@cross_origin(origin='*')
 def runAI():
     if request.method == 'POST':
         if not request.is_json:
@@ -70,6 +72,28 @@ def runAI():
         return jsonify(theMove)
         # return jsonify({"move": 3})
 
+@app.route("/ai2", methods=['POST'])
+@cross_origin(origin='*')
+def runAI2():
+    if request.method == 'POST':
+        if not request.is_json:
+            return jsonify({"error": "Request must be JSON"}), 400
+        data = request.get_json()
+        print("printing data from request")
+        if data is None:
+            print("data is none")
+            return jsonify({"error": "Request must be JSON"}), 400
+        print(data)
+        theMove = bestMove2(data)
+        
+        # try :
+            
+        # except Exception as e:
+        #     print(e)
+        #     theMove = {"error": "An error occurred"}
+        return jsonify(theMove)
+        # return jsonify({"move": 3})
+
 def remove_json_block(json_string):
     # Find the index of the first '{' and the last '}'
     start_index = json_string.find('{')
@@ -81,8 +105,9 @@ def remove_json_block(json_string):
     return content
 
 @app.route("/openai", methods=['POST'])
+@cross_origin(origin='*')
 def openAI():
-    systemPrompt1 = "here is gameState for a pokemon battle you will figure out the best move to take against the other player, you are ai and you will only return {“move”: 0-3} or {“switch”: 0-2}, the move will be from the moveset of the active pokemon and switch will be which pokemon to switch to, remember to choose the strongest move:"
+    systemPrompt1 = "You are a pokemon master that will choose the best move, here is gameState for a pokemon battle you will figure out the best move to take against the other player, you are ai and you will only return {“move”: 0-3} or {“switch”: 0-2}, the move property will be from the moveset of the active pokemon and switch property will be which pokemon to switch to, remember to choose the highest numbered move DO NOT CHOOSE MOVE WITH 0 POWER:"
     systemPrompt2 = "You are a pokemon master that will choose the best move from the AI player with given gamestate of a pokemon battle you will return a json object containing only which pokemon move you would choose from the active pokemon memebers from the team, or you will choose to switch to a different pokemon indicating which index from the pokemon team array. you will return move: 0-3 or switch: 0-2"
     if request.method == 'POST':
         if not request.is_json:
