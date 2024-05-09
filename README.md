@@ -93,7 +93,7 @@ These files collectively form the backend logic for the Pokémon battle simulati
 - The main.py file at the root level could be an entry point for the application or a script for testing or development purposes.
 - The LICENSE and README.md files provide information about the project's licensing and usage.
 
-## How to interact with the code
+## How to interact with the program
 - tmp
 
 ## What does each file/folder do?
