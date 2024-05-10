@@ -96,7 +96,16 @@ These files collectively form the backend logic for the Pokémon battle simulati
 - The LICENSE and README.md files provide information about the project's licensing and usage.
 
 ## How to interact with the program
-- how can someone compile and run this on their own machine
+Head over to [https://pokemon-master-production.up.railway.app](https://pokemon-master-production.up.railway.app) and check out the live version! 
+Once on the webpage, you will need to: 
+1. Select your 3 pokemon from the search drop down menu on the top of the page.
+2. Once you have selected your 3 pokemon, you will be able to select which AI you want versus your pokemon.
+3. Your selections are: `GPT-4`, `MinMax`, `BetterMinMax` <br>
+`GPT-4` GPT-4 Sends the current game state to the GPT API, returning the best move possible which GPT thinks <br>
+`MinMax` is our orinigal algorithm, which does take a long time to compute the best move (2-3 min for each move) <br>
+`BetterMinMax` is the best rendition of the AI, incorporated type multipliers and pruning, allowing for a much quicker response time from the server (1-2 min)
+4. Once you have selected the AI's, the web app will work as intended. There will be an indicator, (red ai) (green player), specifying which users turn it is.
+5. Enjoy!
 
 ## What does each file/folder do?
 - describe backend and front end folder directories and how they interact
