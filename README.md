@@ -96,8 +96,8 @@ These files collectively form the backend logic for the Pokémon battle simulati
 - The LICENSE and README.md files provide information about the project's licensing and usage.
 
 ## How to interact with the program
-- tmp
+- how can someone compile and run this on their own machine
 
 ## What does each file/folder do?
-- tmp
+- describe backend and front end folder directories and how they interact
 
