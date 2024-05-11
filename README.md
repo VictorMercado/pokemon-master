@@ -109,23 +109,23 @@ Once on the webpage, you will need to:
 
 ## What does each file/folder do?
 But if you want to run the project locally, you can follow these steps:
--First, clone the repository to your local machine.
--Then, navigate to the frontend project directory and install the necessary dependencies using npm or bun:
--(This directory is responsible for the user interface of the application, built using React.)
--(It handles user interactions, displays game state information, and communicates with the backend server.)
--(App.tsx is the main component that sets up the game state and handles user actions)
--(PokemonBattle.tsx renders the game interface.))
--Build the project using npm run build or yarn build or bun build.
--This will create a dist folder containing the static files for the frontend.
--You will need to serve these static files using a web server. This is where the backend comes in.
--Place the dist folder in the backend/static directory.
--Then create a virtual environment and install the Python dependencies using pip install -r requirements.txt.
--The Flask application in app.py serves the static files and provides the backend logic for the Pokémon battle simulation, this is also where we host an API route to use ChatGPT.
--game.py and game2.py contain the different MinMax algorithms, including functions for parsing game state, calculating moves.
--To fight GPT AI you will need an OpenAI API key, which you can get by signing up for an account on the OpenAI website.
--You will need to add an .env file in the backend directory with the following content:
--OPENAI_API_KEY=your_api_key_here
--Also ensure you have PORT=5000 in the .env file.
--Run the Flask application using the flask command and ensure you are in the root directory:  flask --app backend/app run
--This will start the Flask server, and you can access the application at http://localhost:5000.
+-   First, clone the repository to your local machine.
+-   Then, navigate to the frontend project directory and install the necessary dependencies using npm or bun:
+-   (This directory is responsible for the user interface of the application, built using React.)
+-   (It handles user interactions, displays game state information, and communicates with the backend server.)
+-   (App.tsx is the main component that sets up the game state and handles user actions)
+-   (PokemonBattle.tsx renders the game interface.))
+-   Build the project using npm run build or yarn build or bun build.
+-   This will create a dist folder containing the static files for the frontend.
+-   You will need to serve these static files using a web server. This is where the backend comes in.
+-   Place the dist folder in the backend/static directory.
+-   Then create a virtual environment and install the Python dependencies using pip install -r requirements.txt.
+-   The Flask application in app.py serves the static files and provides the backend logic for the Pokémon battle simulation, this is also where we host an API route to use ChatGPT.
+-   game.py and game2.py contain the different MinMax algorithms, including functions for parsing game state, calculating moves.
+-   To fight GPT AI you will need an OpenAI API key, which you can get by signing up for an account on the OpenAI website.
+-   You will need to add an .env file in the backend directory with the following content:
+-   OPENAI_API_KEY=your_api_key_here
+-   Also ensure you have PORT=5000 in the .env file.
+-   Run the Flask application using the flask command and ensure you are in the root directory:  flask --app backend/app run
+-   This will start the Flask server, and you can access the application at http://localhost:5000.
 
